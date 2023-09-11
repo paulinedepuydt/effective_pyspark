@@ -83,37 +83,26 @@ than that something is right).
 If you're making great speed, try to think of an alternative implementation 
 to `label_holidays` and discuss pros and cons.
 
-### Common business case 1: cleaning data
+### Common business case: cleaning data
 
 Using the information seen in the videos, prepare a sizeable dataset for 
 storage in "the clean zone" of a data lake, by implementing the `clean` 
 function of [clean_flights_starter.py](exercises/h_cleansers/clean_flights_starter.py).
 
-### Peer review
+### Peer review (optional)
 
 In group, discuss the improvements one could make to 
-[bingewatching.py](./exercises/l_code_review/bingewatching.py).
+[bingewatching.py](./exercises/d_code_review/bingewatching.py).
 
-### Common business case 2: report generation
+## Solutions
 
-Create a complete view of the flights data in which you combine the airline
-carriers (a dimension table), the airport names (another dimension table) and
-the flights tables (a facts table).
+Solutions to the exercises are in the solutions.tb64 file, which is a base64
+encoded tarball. The tarball was zipped using gzip. That should provide most
+people with some bash experience the information they need to extract this.
 
-Your manager wants to know how many flights were operated by American Airlines
-in 2011.
-
-How many of those flights arrived with less than (or equal to) 10 minutes of
-delay?
-
-A data scientist is looking for correlations between the departure delays and
-the dates. In particular, he/she thinks that on Fridays there are relatively
-speaking more flights departing with a delay than on any other day of the week.
-Verify his/her claim.
-
-Out of the 5 categories of sources for delays, which one appeared most often in
-2011? In other words, in which category should we invest more time to improve?
-applications
+Putting solutions on a different branch has some downsides, such as making it
+hard to keep partial files (the starters) aligned with their solutions in, for
+example, the function definitions.
 
 [this gitpod]: https://gitpod.io/#https://github.com/datamindedacademy/effective_pyspark
 [gitpod logo]: https://gitpod.io/button/open-in-gitpod.svg
