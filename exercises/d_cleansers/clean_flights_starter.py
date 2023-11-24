@@ -16,9 +16,9 @@
 #   there (together with the instructor).
 # For explanations on the columns, check https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGK
 from pathlib import Path
-
 from pyspark.sql import SparkSession, DataFrame
-
+import pyspark.sql.functions as psf
+from pyspark.sql.functions import expr
 
 def read_data(path: Path):
     spark = SparkSession.builder.getOrCreate()
@@ -37,28 +37,43 @@ def read_data(path: Path):
     )
 
 
-def clean(frame: DataFrame) -> DataFrame:
-    return frame
+# use relative paths, so that the location of this project on your system
+# won't mean editing paths
+resources_dir = Path("/workspace/effective_pyspark/exercises") / "resources"
+# Create the folder where the results of this script's ETL-pipeline will
+# be stored.
+# Extract
+frame = read_data(resources_dir / "flight" / "part-00001")
+frame.show()
 
 
-if __name__ == "__main__":
-    # use relative paths, so that the location of this project on your system
-    # won't mean editing paths
-    path_to_exercises = Path(__file__).parents[1]
-    resources_dir = path_to_exercises / "resources"
-    target_dir = path_to_exercises / "target"
-    # Create the folder where the results of this script's ETL-pipeline will
-    # be stored.
-    target_dir.mkdir(exist_ok=True)
+# TODO: bad placeholders e.g. 9, poor data types, desc names, redundant info
+def clean(df: DataFrame) -> DataFrame:
+    # rename columns
+    df = (df.withColumnRenamed("FL_DATE", "FLIGHT_DATE")
+          .withColumnRenamed("ORIGIN_STATE_ABR", "ORIGIN_STATE")
+          .withColumnRenamed("DEST_STATE_ABR", "DEST_STATE")
+          .withColumnRenamed("DEP_TIME", "DEPARTURE_TIME")
+          .withColumnRenamed("CRS_DEP_TIME", "PLANNED_DEPARTURE_TIME"))
+    # change types
+    # df = df.select(psf.to_date(psf.col("FLIGHT_DATE"), "dd-MMM-yyyy").alias("FLIGHT_DATE"))
+    # filter NULLs
+    return df
 
-    # Extract
-    frame = read_data(resources_dir / "flights")
-    # Transform
-    cleaned_frame = clean(frame)
-    # Load
-    cleaned_frame.write.parquet(
-        path=str(target_dir / "cleaned_flights"),
-        mode="overwrite",
-        # Exercise: how much bigger are the files when the compression codec is set to "uncompressed"? And 'gzip'?
-        compression="snappy",
-    )
+
+# Transform
+cleaned_frame = clean(frame)
+cleaned_frame.show(4)
+
+cleaned_frame.printSchema()
+
+# Load
+target_dir = Path("/workspace/effective_pyspark/exercises") / "target"
+target_dir.mkdir(exist_ok=True)
+cleaned_frame.write.parquet(
+    path=str(target_dir / "cleaned_flights"),
+    mode="overwrite",
+    # Exercise: how much bigger are the files when the compression codec is set to "uncompressed"? And 'gzip'?
+    compression="snappy",
+)
+
