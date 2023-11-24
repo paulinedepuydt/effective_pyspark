@@ -22,7 +22,6 @@ def label_weekend(frame: DataFrame, colname: str = "date", new_colname: str = "i
     return frame
 
 
-
 def label_holidays(
     frame: DataFrame,
     colname: str = "date",

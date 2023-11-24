@@ -47,7 +47,6 @@ frame = read_data(resources_dir / "flight" / "part-00001")
 frame.show()
 
 
-# TODO: bad placeholders e.g. 9, poor data types, desc names, redundant info
 def clean(df: DataFrame) -> DataFrame:
     # rename columns
     df = (df.withColumnRenamed("FL_DATE", "FLIGHT_DATE")
@@ -57,7 +56,10 @@ def clean(df: DataFrame) -> DataFrame:
           .withColumnRenamed("CRS_DEP_TIME", "PLANNED_DEPARTURE_TIME"))
     # change types
     # df = df.select(psf.to_date(psf.col("FLIGHT_DATE"), "dd-MMM-yyyy").alias("FLIGHT_DATE"))
+    # drop columns
+    df = df.drop("_c44")
     # filter NULLs
+    df = df.na.drop(subset=["TAIL_NUM"])
     return df
 
 
@@ -66,6 +68,15 @@ cleaned_frame = clean(frame)
 cleaned_frame.show(4)
 
 cleaned_frame.printSchema()
+cleaned_frame.filter(cleaned_frame.TAIL_NUM.isNull()).show()
+
+
+# Query
+cleaned_frame.registerTempTable("table")
+
+spark = SparkSession.builder.getOrCreate()
+spark.sql("SELECT count(*) FROM table where YEAR=2011").show()
+
 
 # Load
 target_dir = Path("/workspace/effective_pyspark/exercises") / "target"
